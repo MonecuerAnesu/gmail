@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Account Recovery</title>
+  <style>
+    /* Reset and base */
+    body {
+      background-color: #f5f5f5;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+      overflow-x: hidden;
+      padding: 10px;
+      color: #333;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+      max-width: 420px;
+      width: 100%;
+      position: relative;
+      z-index: 10;
+    }
+
+    .logo img {
+      height: 50px;
+      margin-bottom: 20px;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .message {
+      font-size: 1.15rem;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    p {
+      margin-top: 0;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: #666;
+    }
+
+    .timer {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #1a73e8;
+      letter-spacing: 1.2px;
+      margin-bottom: 20px;
+    }
+
+    /* Animation container */
+    .animation-area {
+      position: fixed;
+      bottom: 15px;
+      left: 0;
+      width: 100%;
+      height: 140px;
+      pointer-events: none;
+      z-index: 5;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 30px;
+      padding: 0 10px;
+      box-sizing: border-box;
+      flex-wrap: nowrap;
+      overflow: visible;
+    }
+
+    /* Person eating popcorn */
+    .popcorn-person {
+      position: relative;
+      width: 90px;
+      height: 130px;
+      animation: subtleBounce 3s ease-in-out infinite;
+      cursor: default;
+      filter: drop-shadow(0 1px 0 rgba(0,0,0,0.1));
+    }
+    /* Head */
+    .popcorn-person .head {
+      width: 50px;
+      height: 50px;
+      background: #f2c9ac;
+      border-radius: 50%;
+      position: relative;
+      margin: 0 auto 5px;
+      box-shadow: inset 0 3px 0 #d8a97f;
+      animation: headNod 4s ease-in-out infinite;
+    }
+    /* Eyes */
+    .popcorn-person .head::before,
+    .popcorn-person .head::after {
+      content: '';
+      position: absolute;
+      top: 18px;
+      width: 8px;
+      height: 8px;
+      background: #333;
+      border-radius: 50%;
+      box-shadow: 0 0 2px #111;
+    }
+    .popcorn-person .head::before {
+      left: 12px;
+    }
+    .popcorn-person .head::after {
+      right: 12px;
+    }
+    /* Smile */
+    .popcorn-person .mouth {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      width: 20px;
+      height: 8px;
+      border-bottom: 3px solid #b04e4e;
+      border-radius: 0 0 15px 15px;
+      transform: translateX(-50%);
+      animation: mouthMove 5s ease-in-out infinite;
+    }
+    /* Body */
+    .popcorn-person .body {
+      width: 40px;
+      height: 60px;
+      background: #567dff;
+      border-radius: 12px 12px 6px 6px;
+      margin: 0 auto;
+      position: relative;
+      box-shadow: inset 0 -5px 10px #3b59d9;
+    }
+    /* Arms */
+    .popcorn-person .arm-left,
+    .popcorn-person .arm-right {
+      position: absolute;
+      top: 35px;
+      width: 14px;
+      height: 40px;
+      background: #f2c9ac;
+      border-radius: 10px;
+      animation: armEat 6s ease-in-out infinite;
+      transform-origin: top center;
+      box-shadow: inset 0 2px 4px #d8a97f;
+    }
+    .popcorn-person .arm-left {
+      left: -12px;
+      animation-delay: 0s;
+    }
+    .popcorn-person .arm-right {
+      right: -12px;
+      animation-delay: 3s;
+    }
+    /* Popcorn bucket */
+    .popcorn-person .popcorn-bucket {
+      position: absolute;
+      bottom: 15px;
+      left: 50%;
+      width: 40px;
+      height: 45px;
+      background: repeating-linear-gradient(
+        45deg,
+        #ffeb3b,
+        #ffeb3b 6px,
+        #fbc02d 6px,
+        #fbc02d 12px
+      );
+      border-radius: 12px 12px 6px 6px;
+      transform: translateX(-50%);
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    }
+    .popcorn-person .popcorn-top {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      width: 50px;
+      height: 18px;
+      background: #fff7b1;
+      border-radius: 20px 20px 0 0;
+      box-shadow: inset 0 3px 8px #f5f1a0;
+      transform: translateX(-50%);
+      animation: popcornJump 6s ease-in-out infinite;
+    }
+
+    /* Phone with smile */
+    .phone-smile {
+      position: relative;
+      width: 80px;
+      height: 130px;
+      background: #2d2d2d;
+      border-radius: 30px 30px 25px 25px;
+      box-shadow:
+        inset 0 10px 15px #555,
+        0 5px 10px rgba(0,0,0,0.3);
+      animation: phoneWiggle 4s ease-in-out infinite;
+      cursor: default;
+      filter: drop-shadow(0 1px 0 rgba(0,0,0,0.15));
+    }
+    /* Phone screen */
+    .phone-smile .screen {
+      position: absolute;
+      top: 15px;
+      left: 10px;
+      right: 10px;
+      bottom: 20px;
+      background: #a0d8f7;
+      border-radius: 18px 18px 15px 15px;
+      box-shadow: inset 0 3px 8px #75c0ea;
+    }
+    /* Eyes on screen */
+    .phone-smile .eye {
+      position: absolute;
+      top: 45px;
+      width: 12px;
+      height: 12px;
+      background: #084c8d;
+      border-radius: 50%;
+      box-shadow: 0 0 3px #0b64b0;
+      animation: eyeBlink 6s ease-in-out infinite;
+    }
+    .phone-smile .eye.left {
+      left: 30px;
+    }
+    .phone-smile .eye.right {
+      right: 30px;
+    }
+    /* Smile on screen */
+    .phone-smile .smile {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      width: 40px;
+      height: 20px;
+      border-bottom: 5px solid #084c8d;
+      border-radius: 0 0 20px 20px;
+      transform: translateX(-50%);
+      animation: smileMove 6s ease-in-out infinite;
+    }
+
+    /* Bicycle rider animation */
+    .bicycle {
+      position: absolute;
+      bottom: 0;
+      left: -100px;
+      width: 100px;
+      height: 100px;
+      animation: rideBike 15s linear infinite;
+      filter: drop-shadow(0 2px 1px rgba(0,0,0,0.15));
+      cursor: default;
+    }
+    /* Simplified bicycle using CSS shapes */
+    .bike-frame {
+      position: relative;
+      width: 80px;
+      height: 50px;
+      border-bottom: 6px solid #555;
+      border-left: 6px solid #555;
+      border-right: 6px solid #555;
+      border-top: 6px solid transparent;
+      border-radius: 6px;
+      margin-left: 10px;
+      transform: rotate(-15deg);
+      top: 25px;
+    }
+    .wheel {
+      position: absolute;
+      bottom: 0;
+      width: 30px;
+      height: 30px;
+      border: 5px solid #333;
+      border-radius: 50%;
+      background: transparent;
+      box-sizing: border-box;
+      animation: wheelSpin 1s linear infinite;
+    }
+    .wheel.front {
+      right: 0;
+    }
+    .wheel.back {
+      left: 0;
+    }
+    .rider {
+      position: absolute;
+      bottom: 50px;
+      left: 35px;
+      width: 20px;
+      height: 30px;
+      background: #444;
+      border-radius: 10px 10px 0 0;
+    }
+    .head {
+      position: absolute;
+      top: -20px;
+      left: 3px;
+      width: 14px;
+      height: 14px;
+      background: #f2c9ac;
+      border-radius: 50%;
+    }
+
+    @keyframes rideBike {
+      0% { left: -100px; }
+      100% { left: 110vw; }
+    }
+
+    @keyframes wheelSpin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+
+    /* Car animation */
+    .car {
+      position: absolute;
+      bottom: 10px;
+      left: 110vw;
+      width: 120px;
+      height: 60px;
+      animation: driveCar 20s linear infinite;
+      filter: drop-shadow(0 3px 2px rgba(0,0,0,0.2));
+      cursor: default;
+    }
+    .car-body {
+      position: relative;
+      width: 120px;
+      height: 40px;
+      background: #1a73e8;
+      border-radius: 10px 10px 4px 4px;
+      box-shadow: 0 3px 0 #155ab6;
+    }
+    .car-window {
+      position: absolute;
+      top: 6px;
+      left: 15px;
+      width: 60px;
+      height: 22px;
+      background: #d6e9ff;
+      border-radius: 4px;
+      border: 2px solid #b6d0ff;
+    }
+    .wheel-car {
+      position: absolute;
+      bottom: 0;
+      width: 30px;
+      height: 30px;
+      background: #333;
+      border-radius: 50%;
+      border: 5px solid #666;
+      animation: wheelSpin 1.2s linear infinite;
+    }
+    .wheel-car.front {
+      left: 15px;
+    }
+    .wheel-car.back {
+      right: 15px;
+    }
+
+    @keyframes driveCar {
+      0% { left: 110vw; }
+      100% { left: -150px; }
+    }
+
+    /* Additional animations */
+    @keyframes subtleBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @keyframes headNod {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(5deg); }
+    }
+
+    @keyframes mouthMove {
+      0%, 100% { border-bottom-color: #b04e4e; }
+      50% { border-bottom-color: #a13737; }
+    }
+
+    @keyframes armEat {
+      0%, 50%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-40deg); }
+      75% { transform: rotate(-30deg); }
+    }
+
+    @keyframes popcornJump {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-6px); }
+    }
+
+    @keyframes phoneWiggle {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(5deg); }
+    }
+
+    @keyframes eyeBlink {
+      0%, 20%, 40%, 100% { height: 12px; }
+      30%, 35% { height: 2px; }
+    }
+
+    @keyframes smileMove {
+      0%, 100% { border-bottom-color: #084c8d; }
+      50% { border-bottom-color: #0b64b0; }
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px;
+        max-width: 95%;
+      }
+      .animation-area {
+        height: 120px;
+        gap: 20px;
+      }
+      .popcorn-person {
+        width: 70px;
+        height: 100px;
+      }
+      .phone-smile {
+        width: 60px;
+        height: 100px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="main" aria-label="Account Recovery status">
+    <div class="logo" aria-hidden="true">
+      <img src="logo.png" alt="MyMail Logo" />
+    </div>
+
+    <!-- Removed emojis, replaced with text -->
+    <div aria-live="polite" aria-atomic="true" class="message">Your account info is under review.</div>
+    <p>Please check back after:</p>
+    <div class="timer" id="countdown" aria-live="polite" aria-atomic="true">30:00</div>
+  </div>
+
+  <div class="animation-area" aria-hidden="true">
+    <!-- Person eating popcorn -->
+    <div class="popcorn-person" role="img" aria-label="Person eating popcorn waiting">
+      <div class="head">
+        <div class="mouth"></div>
+      </div>
+      <div class="body"></div>
+      <div class="arm-left"></div>
+      <div class="arm-right"></div>
+      <div class="popcorn-bucket"></div>
+      <div class="popcorn-top"></div>
+    </div>
+
+    <!-- Smiling phone -->
+    <div class="phone-smile" role="img" aria-label="Smiling phone waiting">
+      <div class="screen">
+        <div class="eye left"></div>
+        <div class="eye right"></div>
+        <div class="smile"></div>
+      </div>
+    </div>
+
+    <!-- Bicycle rider -->
+    <div class="bicycle" role="img" aria-label="Animated bicycle rider">
+      <div class="bike-frame"></div>
+      <div class="wheel back"></div>
+      <div class="wheel front"></div>
+      <div class="rider">
+        <div class="head"></div>
+      </div>
+    </div>
+
+    <!-- Car driving -->
+    <div class="car" role="img" aria-label="Animated car driving">
+      <div class="car-body">
+        <div class="car-window"></div>
+        <div class="wheel-car front"></div>
+        <div class="wheel-car back"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let timeLeft = 30 * 60;
+
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+      const s = (seconds % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    function updateCountdown() {
+      document.getElementById("countdown").textContent = formatTime(timeLeft);
+      if (timeLeft > 0) {
+        timeLeft--;
+        setTimeout(updateCountdown, 1000);
+      } else {
+        document.querySelector(".message").textContent = "Review period complete!";
+      }
+    }
+
+    updateCountdown();
+  </script>
+</body>
+</html>

